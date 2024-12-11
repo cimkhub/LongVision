@@ -1,4 +1,4 @@
-#!/Users/lukas/Documents/video-processing-app/env/bin/python3.11
+#!/Users/lukas/Documents/Longvision/LongVision/env/bin/python3.11
 # -*- coding: utf-8 -*-
 import re
 import sys
