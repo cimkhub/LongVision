@@ -39,7 +39,12 @@ jobs:
         run: unzip -l release.zip
 
       - name: Set permissions for startup script
-        run: chmod +x startup.sh
+        run: |
+          if unzip -l release.zip | grep -q "startup.sh"; then
+            chmod +x startup.sh
+          else
+            echo "Warning: startup.sh not found in artifact!"
+          fi
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
@@ -82,4 +87,11 @@ jobs:
           slot-name: 'Production'
 
       - name: Verify deployment files
-        run: ls /home/site/wwwroot
+        run: |
+          ls /home/site/wwwroot
+          if [ -f /home/site/wwwroot/startup.sh ]; then
+            echo "startup.sh found and deployed successfully."
+          else
+            echo "Error: startup.sh not found in deployment directory!"
+            exit 1
+          fi
