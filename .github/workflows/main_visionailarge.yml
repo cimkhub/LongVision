@@ -33,18 +33,7 @@ jobs:
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
       - name: Zip artifact for deployment
-        run: zip release.zip ./* -r -x "venv/*" "other/excluded/files/*"
-
-      - name: Verify artifact contents
-        run: unzip -l release.zip
-
-      - name: Set permissions for startup script
-        run: |
-          if unzip -l release.zip | grep -q "startup.sh"; then
-            chmod +x startup.sh
-          else
-            echo "Warning: startup.sh not found in artifact!"
-          fi
+        run: zip release.zip ./* -r
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
@@ -61,7 +50,7 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write # This is required for requesting the JWT
+      id-token: write #This is required for requesting the JWT
 
     steps:
       - name: Download artifact from build job
@@ -72,17 +61,13 @@ jobs:
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgl1 ffmpeg libsm6 libxext6
-
+      
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_D1F4DE93A58C483287D8AC70818B389A }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_4BF4FC29C2794F54BC348CD1302E4A19 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_AE1C5031E6504AB4B74643C43BD750AD }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_AE5F2C8A373C48AE8EBAA3D65DCF7938 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_47531B5B7DD140A5BE03CAAF472B7600 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_49A6EF44940D491E8E2ECBF6118A09A8 }}
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
@@ -90,13 +75,4 @@ jobs:
         with:
           app-name: 'VisionAILarge'
           slot-name: 'Production'
-
-      - name: Verify deployment files
-        run: |
-          ls /home/site/wwwroot
-          if [ -f /home/site/wwwroot/startup.sh ]; then
-            echo "startup.sh found and deployed successfully."
-          else
-            echo "Error: startup.sh not found in deployment directory!"
-            exit 1
-          fi
+          
